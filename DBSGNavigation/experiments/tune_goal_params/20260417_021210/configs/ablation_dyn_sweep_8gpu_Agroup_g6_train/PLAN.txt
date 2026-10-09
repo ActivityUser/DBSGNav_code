@@ -1,0 +1,44 @@
+目标：在「完整系统」协议下（SG+OV+dyn+benchmark 全开），使 Success/SPL 超过当前 wo_dyn 基线。
+
+参考数字（train, n=1000，你已有日志）：
+  wo_dyn：     Succ ≈ 0.689，SPL ≈ 0.619
+  full：       Succ ≈ 0.607，SPL ≈ 0.568
+  full_dyn_tuned：Succ ≈ 0.639，SPL ≈ 0.597  （仍落后 wo_dyn）
+
+差距本质：wo_dyn 关掉了「动态语义图更新 + 规划器里的语义相关格融合」整条链路；
+要在「dyn 仍开」时超过 wo_dyn，需要让动态更新与 planner 语义引导「净贡献为正」。
+
+--------------------------------------------------------------------
+第一轮：8 卡并行（本目录 s01…s08）
+母版均为 full_dyn_tuned.yaml，仅改一项，便于归因：
+
+  s01_alpha005   blend_alpha 0.05   （更慢融合，减噪声）
+  s02_alpha015   blend_alpha 0.15   （略快融合）
+  s03_int1       update_interval 1  （每步可更新）
+  s04_int3       update_interval 3  （更稀疏更新）
+  s05_cons025    min_consistency 0.25
+  s06_cons045    min_consistency 0.45
+  s07_plthr024   planner_thr 0.24   （更少格触发语义 goal 增强）
+  s08_plmin4     planner_min_timestep 4（更早启用语义规划）
+
+运行：
+  cd $ROOT/DBSGNavigation
+  bash experiments/.../run_ablation_dyn_sweep_8gpu_Agroup_g6_train.sh parallel 1000 0 1 2 3 4 5 6 7
+
+汇总（按 Succ 排序）：
+  python experiments/.../tools/summarize_dyn_sweep_8gpu.py --ep 1000
+
+--------------------------------------------------------------------
+第二轮（根据第一轮冠军再开 8 条）
+若某 stem 明显最好，以其为母版再做局部微调，例如：
+  - alpha 在冠军附近 ±0.02
+  - interval 冠军±1
+  - planner_thr 0.20 / 0.22 / 0.26
+  - adaptive_alpha 改为 false 或 "count"（与 consistency 对比）
+  - max_goal_dist：0（关距离门）、8、10
+  - disable_when_ov_geo_floor_weak：false（对比 OV 弱时仍是否更新）
+
+--------------------------------------------------------------------
+判据
+  主判据：Succ；次判据：SPL；可看 dist 是否同步下降。
+  若多组接近 wo_dyn：可固定 seed 或再跑 1 次确认波动。

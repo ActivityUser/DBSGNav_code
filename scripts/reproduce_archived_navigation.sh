@@ -3,7 +3,7 @@
 # Existing experiment logs are never used as output destinations.
 set -euo pipefail
 ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
-NAV="$ROOT/GaussianNavigation"
+NAV="$ROOT/DBSGNavigation"
 PRESET="${1:-full_scene_crop}"
 GPU="${2:-0}"
 EP="${3:-2}"

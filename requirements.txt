@@ -4,4 +4,4 @@ scikit-image
 numpy
 ifcfg
 open3d
-GaussianConstruction/diff-gaussian-rasterization-w-depth
+DBSGConstruction/diff-gaussian-rasterization-w-depth

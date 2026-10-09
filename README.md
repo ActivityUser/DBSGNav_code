@@ -34,7 +34,7 @@ conda activate .runtime/gausshabitat
 若要编译建图用的高斯光栅化扩展：
 
 ```bash
-cd GaussianConstruction/diff-gaussian-rasterization-w-depth
+cd DBSGConstruction/diff-gaussian-rasterization-w-depth
 pip install --no-build-isolation .
 ```
 
@@ -52,25 +52,25 @@ CLIP ViT-B-32 会在首次运行时按 `ViT-B-32` / `openai` 下载。脚本默�
 
 | 用途 | 放到 |
 | --- | --- |
-| HM3D v0.2 场景 | `GaussianNavigation/data/scene_datasets/hm3d_v0.2/` |
-| Instance ImageNav HM3D v3 val（1000 episodes，36 个场景） | `GaussianNavigation/data/datasets/instance_imagenav/hm3d/v3/val/` |
-| 语义高斯地图 | `GaussianConstruction/experiments/habitat_val_inst_aligned_v3/<scene>_seed4_clip/params.npz` |
-| 实例检索与 v2 CLIP 向量 | `GaussianConstruction/configs/data/habitat_val/<scene>/` |
+| HM3D v0.2 场景 | `DBSGNavigation/data/scene_datasets/hm3d_v0.2/` |
+| Instance ImageNav HM3D v3 val（1000 episodes，36 个场景） | `DBSGNavigation/data/datasets/instance_imagenav/hm3d/v3/val/` |
+| 语义高斯地图 | `DBSGConstruction/experiments/habitat_val_inst_aligned_v3/<scene>_seed4_clip/params.npz` |
+| 实例检索与 v2 CLIP 向量 | `DBSGConstruction/configs/data/habitat_val/<scene>/` |
 
-HM3D 和 Instance ImageNav 的下载遵循 [Habitat-Lab 0.2.3 数据集说明](https://github.com/facebookresearch/habitat-lab/blob/v0.2.3/DATASETS.md)。episode 配置读取 `data/datasets/instance_imagenav/hm3d/v3/{split}/{split}.json.gz`，场景目录为 `data/scene_datasets/`，路径都相对 `GaussianNavigation`。
+HM3D 和 Instance ImageNav 的下载遵循 [Habitat-Lab 0.2.3 数据集说明](https://github.com/facebookresearch/habitat-lab/blob/v0.2.3/DATASETS.md)。episode 配置读取 `data/datasets/instance_imagenav/hm3d/v3/{split}/{split}.json.gz`，场景目录为 `data/scene_datasets/`，路径都相对 `DBSGNavigation`。
 
 每个场景的检索目录需要包含 `instance_retrieval.json`、`instance_clip_vectors_v2.json`、`transforms.json` 和 `rgb/`。v2 向量用实例掩码裁剪后再编码：
 
 ```bash
-cd GaussianNavigation
+cd DBSGNavigation
 python gaussian_utils/build_instance_clip_vectors_v2.py \
-  --scenes_root ../GaussianConstruction/configs/data/habitat_val
+  --scenes_root ../DBSGConstruction/configs/data/habitat_val
 ```
 
-语义高斯地图由建图结果对齐得到。先准备 `GaussianConstruction/configs/data/habitat_val/<scene>/` 下的 RGB、深度和 `transforms.json`，再在 `GaussianConstruction` 中建图并对齐：
+语义高斯地图由建图结果对齐得到。先准备 `DBSGConstruction/configs/data/habitat_val/<scene>/` 下的 RGB、深度和 `transforms.json`，再在 `DBSGConstruction` 中建图并对齐：
 
 ```bash
-cd GaussianConstruction
+cd DBSGConstruction
 bash scripts/preflight_build_val.sh configs/data/habitat_val habitat_val_dense_clip_v2
 python scripts/run_build_val_semantic_gaussians.py \
   --data_dir configs/data/habitat_val \
@@ -83,7 +83,7 @@ bash scripts/run_build_inst_aligned_parallel.sh \
   experiments/habitat_val_inst_aligned_v3
 ```
 
-评测配置里的地图根目录是 `../GaussianConstruction/experiments/habitat_val_inst_aligned_v3`，检索根目录是 `../GaussianConstruction/configs/data/habitat_val`。
+评测配置里的地图根目录是 `../DBSGConstruction/experiments/habitat_val_inst_aligned_v3`，检索根目录是 `../DBSGConstruction/configs/data/habitat_val`。
 
 ## 3. 启动 Qwen3-VL
 
@@ -108,7 +108,7 @@ export GAUSSNAV_VLM_API_KEY=EMPTY
 
 ## 4. 复现 full_scene_crop 的 1000 episode 结果
 
-历史日志 `full_scene_crop_1000ep.nohup` 由下面这条评测产生：配置文件为 `full_scene_crop.yaml`，入口为 `GaussianNavigation/run_val.py`，`--max_episodes 1000`。日志里打印的指标是：
+历史日志 `full_scene_crop_1000ep.nohup` 由下面这条评测产生：配置文件为 `full_scene_crop.yaml`，入口为 `DBSGNavigation/run_val.py`，`--max_episodes 1000`。日志里打印的指标是：
 
 ```text
 succ / spl / dist / nonGT_cov / GT_fb_rate : 0.80600/0.74618/1.53373/1.00000/0.00000(1000)
@@ -129,24 +129,24 @@ bash scripts/reproduce_archived_navigation.sh full_scene_crop 0 1000
 
 它会读取
 
-`GaussianNavigation/experiments/tune_goal_params/20260417_021210/configs/ablation_08ext_clip_v2_probe/0.8-0.6_inst_v3_vlm/full_scene_crop.yaml`
+`DBSGNavigation/experiments/tune_goal_params/20260417_021210/configs/ablation_08ext_clip_v2_probe/0.8-0.6_inst_v3_vlm/full_scene_crop.yaml`
 
 并把检查点目录、可视化输出、地图根目录和检索根目录改写到当前仓库，然后执行：
 
 ```bash
-cd GaussianNavigation
+cd DBSGNavigation
 CUDA_VISIBLE_DEVICES=0 python -u run_val.py \
   --config <改写后的 full_scene_crop.yaml> \
   --max_episodes 1000 \
   --log_file <新的输出目录>/full_scene_crop_1000ep.log
 ```
 
-输出写到 `GaussianNavigation/experiments/server_restore/` 下新建的目录，里面有本次使用的配置、命令和日志。不会覆盖仓库里的源码。1000 局是完整评测；把最后的 `1000` 改成 `2` 可以先做连通性检查，两局结果不能用来对上面的指标。
+输出写到 `DBSGNavigation/experiments/server_restore/` 下新建的目录，里面有本次使用的配置、命令和日志。不会覆盖仓库里的源码。1000 局是完整评测；把最后的 `1000` 改成 `2` 可以先做连通性检查，两局结果不能用来对上面的指标。
 
 也可以直接调用与当时 nohup 相同的启动脚本。此时 YAML 里的模型 ID 必须和服务端一致，并且不要依赖上面的路径改写：
 
 ```bash
-cd GaussianNavigation
+cd DBSGNavigation
 bash experiments/tune_goal_params/20260417_021210/configs/ablation_08ext_clip_v2_probe/0.8-0.6_inst_v3_vlm/run_ablation_inst_v3_vlm.sh \
   full_scene_crop 0 1000
 ```
@@ -155,7 +155,7 @@ bash experiments/tune_goal_params/20260417_021210/configs/ablation_08ext_clip_v2
 
 ## 5. 目录
 
-- `GaussianNavigation/`：Instance ImageNav 评测、开放词汇检索和语义高斯目标选择。
-- `GaussianConstruction/`：语义高斯建图，以及带深度的 diff-gaussian-rasterization。
+- `DBSGNavigation/`：Instance ImageNav 评测、开放词汇检索和语义高斯目标选择。
+- `DBSGConstruction/`：语义高斯建图，以及带深度的 diff-gaussian-rasterization。
 - `scripts/restore_navigation_server.sh`：安装导航评测环境。
 - `scripts/run_full_scene_crop_1000ep.sh`：复现上述 1000 episode 评测。

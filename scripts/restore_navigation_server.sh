@@ -64,7 +64,7 @@ if [[ "$MODE" == install ]]; then
   fi
   pip_packages -r "$ROOT/scripts/requirements-navigation-server.txt"
   "$PY" -m pip install --no-build-isolation --no-deps -e \
-    "$ROOT/GaussianNavigation/3rdparty/habitat-lab-0.2.3/habitat-lab"
+    "$ROOT/DBSGNavigation/3rdparty/habitat-lab-0.2.3/habitat-lab"
   # Fixed-commit archive avoids downloading the Git repository's history.
   "$PY" -m pip install --no-build-isolation --no-deps \
     --timeout 45 --retries 2 "$LIGHTGLUE_SOURCE"
@@ -73,7 +73,7 @@ fi
 PY="$ENV_PREFIX/bin/python"
 [[ -x "$PY" ]] || { echo "Environment not installed: $ENV_PREFIX" >&2; exit 1; }
 "$PY" -m pip check
-cd "$ROOT/GaussianNavigation"
+cd "$ROOT/DBSGNavigation"
 "$PY" - <<'PY'
 import sys, torch, habitat_sim, habitat, quaternion, Quaternion
 import cv2, skfmm, open_clip
