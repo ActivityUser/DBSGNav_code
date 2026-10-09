@@ -1,0 +1,13 @@
+# 消融实验：仅创新点2（语义嵌入高斯表示）
+# 用法: python run.py --config configs/instance_imagenav_ablation_innov2.yaml
+
+defaults:
+  - instance_imagenav
+  - _self_
+
+end2end_imagenav:
+  use_semantic_gaussian_goal: True    # 创新点2 开
+  use_open_vocab_retrieval: False     # 创新点3 关
+  use_open_vocab_benchmark: False
+  mapper:
+    enable_dynamic_semantic_update: False

@@ -1,0 +1,15 @@
+# 消融实验：创新点5（开放词汇评估基准）
+# 在标准 Nav 基础上启用零样本测试集，可与其他创新点组合
+# 用法: python run.py --config configs/instance_imagenav_ablation_innov5.yaml
+
+defaults:
+  - instance_imagenav
+  - _self_
+
+end2end_imagenav:
+  use_semantic_gaussian_goal: True
+  use_open_vocab_retrieval: True
+  use_open_vocab_benchmark: True      # 创新点5 开：零样本 episode
+  # open_vocab_data_path: ""          # 可选：预生成的 .json.gz 路径
+  mapper:
+    enable_dynamic_semantic_update: False

@@ -1,0 +1,17 @@
+# 消融实验：创新点3+4（跨模态检索 + 语义-几何融合）
+# 创新点4 依赖创新点3，故同时开启
+# 用法: python run.py --config configs/instance_imagenav_ablation_innov4.yaml
+
+defaults:
+  - instance_imagenav
+  - _self_
+
+end2end_imagenav:
+  use_semantic_gaussian_goal: False   # 创新点2 关
+  use_open_vocab_retrieval: True      # 创新点3 开
+  open_vocab_semantic_weight: 0.7     # 创新点4 开：α·语义 + β·几何
+  fusion_geometric_weight: 0.3
+  fusion_normalize_geometric: "minmax"
+  use_open_vocab_benchmark: False
+  mapper:
+    enable_dynamic_semantic_update: False

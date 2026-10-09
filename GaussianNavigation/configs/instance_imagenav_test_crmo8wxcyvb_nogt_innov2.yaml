@@ -1,0 +1,13 @@
+# 单场景 CrMo8WxCyVb 测试集 — 非GT 模式，仅创新点2
+# 使用 _overrides 避免与 val_nogt 的 defaults 重复导致 Hydra "habitat appears more than once"
+defaults:
+  - instance_imagenav_val_nogt
+  - instance_imagenav_ablation_innov2_overrides
+  - _self_
+
+habitat:
+  dataset:
+    content_scenes: ["CrMo8WxCyVb"]
+
+end2end_imagenav:
+  max_episodes: 1000

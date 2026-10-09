@@ -1,0 +1,21 @@
+# 开放词汇分割默认配置（Grounding DINO + SAM）
+# 使用方式：cd GaussianNavigation && python gaussian_utils/seg_train_imgs.py --config configs/seg_open_vocab.yaml
+
+# 数据路径（val 流程）
+scenes_root: "configs/data/habitat_val"
+
+# Grounding DINO（projects 下与 gaussnav_code 同级）
+grounding_config: "/path/to/GroundingDINO/groundingdino/config/GroundingDINO_SwinT_OGC.py"
+grounding_checkpoint: "/path/to/GroundingDINO/weights/groundingdino_swint_ogc.pth"
+
+# SAM
+sam_checkpoint: "/path/to/SAM/sam_vit_h_4b8939.pth"
+
+# 推理参数
+device: "cuda:0"
+box_threshold: 0.25
+text_threshold: 0.2
+
+# 断点续跑（可选）
+# scene_index_start: 0
+# scene_index_end: null  # null 表示处理到最后一个场景

@@ -1,0 +1,7 @@
+scikit-fmm
+scikit-learn
+scikit-image
+numpy
+ifcfg
+open3d
+GaussianConstruction/diff-gaussian-rasterization-w-depth

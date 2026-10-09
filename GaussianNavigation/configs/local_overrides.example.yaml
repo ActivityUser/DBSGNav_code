@@ -1,0 +1,10 @@
+end2end_imagenav:
+  checkpoint_folder: data/new_checkpoints
+  # SplaTAM 输出：<gaussian_map_root>/<scene_id>_seed4_clip/params.npz
+  gaussian_map_root: experiments/habitat_val_final
+
+seg_open_vocab:
+  scenes_root: configs/data/habitat_val
+  grounding_config: /path/to/GroundingDINO/groundingdino/config/GroundingDINO_SwinT_OGC.py
+  grounding_checkpoint: /path/to/GroundingDINO/weights/groundingdino_swint_ogc.pth
+  sam_checkpoint: /path/to/SAM/sam_vit_h_4b8939.pth

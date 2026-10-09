@@ -1,0 +1,25 @@
+# 诊断配置：快速排查 succ/SPL 偏低原因
+# 用法: CUDA_VISIBLE_DEVICES=0 python run.py --config configs/instance_imagenav_diagnostic.yaml
+#
+# 本配置用于：
+# 1. 开启 allow_gt_fallback，对比 GT 与预测目标：若 succ 显著提升 → 目标预测问题
+# 2. 单场景 + 50 episodes，快速验证（约 10–20 分钟）
+# 3. GPU 0 + num_gpus=1，避免 EGL 崩溃
+
+defaults:
+  - instance_imagenav
+  - _self_
+
+habitat:
+  environment:
+    max_episode_seconds: 120   # 诊断用：约 2 分钟/episode，便于尽快看到 succ/spl/dist
+  simulator:
+    habitat_sim_v0:
+      gpu_device_id: 0  # 避免 EGL device 1 崩溃
+  dataset:
+    content_scenes: ["bCPU9suPUw9"]  # 单场景快速测试；改 ["*"] 可跑全量
+
+end2end_imagenav:
+  max_episodes: 50
+  num_gpus: 1
+  allow_gt_fallback: True  # 诊断用：允许回退到 GT，若 succ 明显升高则说明目标预测是瓶颈

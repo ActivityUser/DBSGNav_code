@@ -1,0 +1,25 @@
+标准协议（IIN）完整系统消融（train / G6 超参）
+
+固定：use_open_vocab_benchmark=false（所有行一致）。
+
+Preset（7 个）：full / wo_dyn / wo_bench / wo_ov / wo_sg_semgeom / wo_sg_fusion_g6 / wo_sg_geom
+
+  - wo_sg_geom：主表 Baseline（OV 纯几何 α=0 β=1）
+  - wo_sg_semgeom：w.o. SG + OV 纯语义（α=1 β=0），导师口径
+  - wo_sg_fusion_g6：w.o. SG + OV G6 融合（α=0.8 β=0.6）
+
+已移除：无 SG 且无 OV 的 preset `baseline`（不再跑、不配 yaml）。
+
+详定义见 EXPERIMENT_DESIGN.md。
+
+运行：
+  bash run_ablation_fullsys_std_Agroup_g6_train.sh all 0 1000
+  或并行（7 卡）：
+  bash run_ablation_fullsys_std_Agroup_g6_train.sh parallel 1000 0 1 2 3 4 5 6
+
+汇总：
+  python experiments/tune_goal_params/20260417_021210/tools/summarize_ablation_fullsys_std_Agroup_g6_train.py \
+    --log-dir experiments/tune_goal_params/20260417_021210/logs_1000ep_rerun/ablation_fullsys_std_Agroup_g6_train \
+    --ep 1000
+
+未跑完全部 log 时可加 --allow-partial

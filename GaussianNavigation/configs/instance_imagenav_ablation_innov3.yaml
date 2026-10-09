@@ -1,0 +1,15 @@
+# 消融实验：仅创新点3（跨模态实例检索，几何优先 alpha=0,beta=1）
+# 用法: python run.py --config configs/instance_imagenav_ablation_innov3.yaml
+
+defaults:
+  - instance_imagenav
+  - _self_
+
+end2end_imagenav:
+  use_semantic_gaussian_goal: False   # 创新点2 关
+  use_open_vocab_retrieval: True      # 创新点3 开
+  open_vocab_semantic_weight: 0.0    # 仅几何（创新点4 关：不融合语义）
+  fusion_geometric_weight: 1.0
+  use_open_vocab_benchmark: False
+  mapper:
+    enable_dynamic_semantic_update: False

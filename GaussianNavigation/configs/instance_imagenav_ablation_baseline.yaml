@@ -1,0 +1,13 @@
+# 消融实验：基线（六个创新点全部关闭）
+# 用法: python run.py --config configs/instance_imagenav_ablation_baseline.yaml
+
+defaults:
+  - instance_imagenav
+  - _self_
+
+end2end_imagenav:
+  use_semantic_gaussian_goal: False   # 创新点2 关
+  use_open_vocab_retrieval: False    # 创新点3 关（使用 compare_bbox）
+  use_open_vocab_benchmark: False    # 创新点5 关
+  mapper:
+    enable_dynamic_semantic_update: False  # 创新点6 关

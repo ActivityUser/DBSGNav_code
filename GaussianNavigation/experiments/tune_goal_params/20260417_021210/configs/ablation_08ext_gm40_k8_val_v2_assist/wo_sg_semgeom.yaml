@@ -1,0 +1,124 @@
+# [v2 assist 母版] 与 ablation_08ext_fix_sg_overfit/fix1_assist 对齐：全表均开 semantic_gaussian_assist_mode=true。原 v1 母版已备份至 _backup_v1/。
+# Val 消融 | w.o. SG；OV 纯语义（fusion_use_semantic=true, use_geometric=false；α/β 记 1/0）。
+# 母版键对齐：full.yaml；相对 full 仅 use_semantic_gaussian_goal: false 且改 OV 融合键。
+defaults:
+- /habitat: habitat_config_base
+- /habitat/task: instance_imagenav
+- /habitat/simulator/agents@habitat.simulator.agents.main_agent: rgbd_agent
+- /habitat/dataset/instance_imagenav: hm3d_v3
+- _self_
+habitat:
+  environment:
+    max_episode_seconds: 1000
+  simulator:
+    agents:
+      main_agent:
+        sim_sensors:
+          rgb_sensor:
+            width: 480
+            height: 640
+            hfov: 42
+            position:
+            - 0
+            - 0.88
+            - 0
+          depth_sensor:
+            width: 480
+            height: 640
+            hfov: 42
+            min_depth: 0.01
+            max_depth: 15.0
+            position:
+            - 0
+            - 0.88
+            - 0
+        height: 0.88
+        radius: 0.17
+    habitat_sim_v0:
+      gpu_device_id: 0
+      allow_sliding: true
+  dataset:
+    split: val
+    content_scenes:
+    - '*'
+end2end_imagenav:
+  env_name: instance_imagenav
+  dump_location: examples/
+  max_episodes: 1000
+  num_envs: 1
+  num_gpus: 1
+  num_nodes: 1
+  split: val
+  node_id: 0
+  gpu_id: 0
+  checkpoint_folder: data/new_checkpoints
+  log_interval: 10
+  num_checkpoints: 100
+  force_torch_single_threaded: true
+  viz_params:
+    viz: false
+    viz_failure_case: true
+  particle_params:
+    method: 1
+    remap_goal: true
+  use_semantic_gaussian_goal: false
+  gaussian_map_root: ../GaussianConstruction/experiments/habitat_val_final
+  semantic_gaussian_top_k: 1
+  semantic_gaussian_min_sim: 0.3
+  semantic_gaussian_high_conf_sim: 0.85
+  semantic_gaussian_ov_disagree_dist: 10.0
+  semantic_gaussian_ov_disagree_high_conf: 0.88
+  semantic_gaussian_ov_disagree_force_dist: 0.0
+  semantic_gaussian_max_agent_goal_dist: 13.0
+  open_vocab_max_agent_goal_dist: 6.0
+  open_vocab_agent_dist_penalty: 0.025
+  fusion_adaptive_weights: false
+  log_episode_goal_summary: true
+  open_vocab_min_geometric_matches: 30
+  prefer_open_vocab_when_semantic_gaussian_low_conf: false
+  semantic_gaussian_enable_fallback_open_vocab: true
+  use_open_vocab_retrieval: true
+  allow_gt_fallback: false
+  non_gt_fallback_handling: count_as_failure
+  open_vocab_top_k: 6
+  open_vocab_semantic_weight: 1.0
+  fusion_geometric_weight: 0.0
+  open_vocab_fusion_use_semantic_score: true
+  open_vocab_fusion_use_geometric_score: false
+  fusion_normalize_geometric: minmax
+  base_scene_path: ../GaussianConstruction/configs/data/habitat_val
+  clip_model_name: ViT-B-32
+  clip_dim: 512
+  use_open_vocab_benchmark: false
+  # --- v2 assist 母版对齐（与 ablation_08ext_fix_sg_overfit/fix1_assist 同）---
+  semantic_gaussian_assist_mode: true
+  semantic_gaussian_assist_min_sim: 0.96
+  semantic_gaussian_assist_only_when_ov_weak: true
+  semantic_gaussian_assist_require_sg_closer_than_ov: true
+  semantic_gaussian_assist_sg_closer_margin: 0.5
+  semantic_gaussian_assist_max_gap: 4.0
+  dynamic_semantic_update_max_goal_dist: 4.0
+  dynamic_semantic_update_disable_when_ov_geo_floor_weak: true
+  dynamic_semantic_planner_max_goal_dist: 3.0
+  dynamic_semantic_planner_disable_when_ov_geo_floor_weak: true
+  open_vocab_circuit_breaker_geo_floor: true
+  open_vocab_circuit_breaker_long_tail: true
+  mapper:
+    dynamic_semantic_blend_alpha: 0.05
+    dynamic_semantic_update_interval: 4
+    dynamic_semantic_update_min_consistency: 0.45
+    dynamic_semantic_adaptive_alpha: consistency
+    dynamic_semantic_renormalize_cells: true
+    dynamic_semantic_planner: true
+    dynamic_semantic_planner_thr: 0.50
+    dynamic_semantic_planner_radius: 6
+    dynamic_semantic_planner_min_timestep: 30
+    dynamic_semantic_planner_peaks_only: true
+    dynamic_semantic_planner_max_peaks: 4
+    dynamic_semantic_planner_peak_min_sep: 8
+    enable_dynamic_semantic_update: true
+    frame_height: 320
+    frame_width: 240
+    map_resolution: 5
+    map_size_cm: 3600
+    global_downscaling: 3

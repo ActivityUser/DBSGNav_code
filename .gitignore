@@ -1,0 +1,27 @@
+__pycache__/
+_pycache_/
+*.py[cod]
+*.egg-info/
+.eggs/
+*.so
+build/
+.runtime/
+.env
+.env.*
+
+# 数据、权重和运行产物由使用者自行准备，不纳入仓库
+GaussianNavigation/data/
+GaussianConstruction/configs/data/
+GaussianConstruction/experiments/
+GaussianConstruction/logs/
+GaussianNavigation/examples/
+**/experiments/**/logs*/
+**/*.log
+**/*.nohup
+**/*.mp4
+**/*.gif
+**/*.png
+**/*.jpg
+**/*.npz
+**/*.ply
+**/*.tsv

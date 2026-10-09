@@ -1,0 +1,15 @@
+# 消融实验：创新点6（动态语义更新）
+# 在标准 Nav 基础上启用增量 CLIP 语义更新
+# 用法: python run.py --config configs/instance_imagenav_ablation_innov6.yaml
+
+defaults:
+  - instance_imagenav
+  - _self_
+
+end2end_imagenav:
+  use_semantic_gaussian_goal: True
+  use_open_vocab_retrieval: True
+  use_open_vocab_benchmark: False
+  mapper:
+    enable_dynamic_semantic_update: True   # 创新点6 开
+    dynamic_semantic_blend_alpha: 0.3

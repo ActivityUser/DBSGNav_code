@@ -1,0 +1,145 @@
+#!/usr/bin/env python3
+"""
+批量建 Semantic Gaussian（带 CLIP）。
+
+支持：
+1) 自动从 data_dir 发现场景（子目录下有 transforms.json）
+2) 指定 scenes_file（每行一个 scene_id）
+3) 指定单场景 sequence
+
+默认会跳过已存在 params.npz 的场景；如需强制重跑可加 --no_skip_existing。
+"""
+
+from __future__ import annotations
+
+import argparse
+import os
+import subprocess
+import sys
+
+
+def _discover_scenes(data_dir: str):
+    scenes = []
+    for name in sorted(os.listdir(data_dir)):
+        scene_dir = os.path.join(data_dir, name)
+        if not os.path.isdir(scene_dir):
+            continue
+        if os.path.isfile(os.path.join(scene_dir, "transforms.json")):
+            scenes.append(name)
+    return scenes
+
+
+def main():
+    parser = argparse.ArgumentParser(description="Batch build Semantic Gaussians for val scenes.")
+    parser.add_argument("--data_dir", type=str, default=None,
+                        help="建图数据根目录（如 configs/data/habitat_val）")
+    parser.add_argument("--basedir", type=str, default=None,
+                        help="显式指定传给 habitat_splatam 的 --basedir（默认跟 data_dir 一致）")
+    parser.add_argument("--scenes_file", type=str, default=None,
+                        help="场景列表文件（每行一个 scene_id）")
+    parser.add_argument("--sequence", type=str, default=None,
+                        help="只跑单场景 scene_id")
+    parser.add_argument("--group_name", type=str, default="habitat_val_final",
+                        help="输出目录 experiments/<group_name>")
+    parser.add_argument("--config", type=str, default=None,
+                        help="habitat_splatam 配置路径，默认 configs/habitat/habitat_splatam.py")
+    parser.add_argument("--script", type=str, default=None,
+                        help="habitat_splatam 脚本路径，默认 scripts/habitat_splatam.py")
+    parser.add_argument("--skip_existing", action="store_true", default=True,
+                        help="若 params.npz 已存在则跳过（默认开启）")
+    parser.add_argument("--no_skip_existing", action="store_false", dest="skip_existing",
+                        help="不跳过，强制重跑")
+    parser.add_argument("--dry_run", action="store_true", help="只打印命令，不执行")
+    parser.add_argument("--max_frames", type=int, default=None,
+                        help="传给 habitat_splatam 的 --num_frames")
+    parser.add_argument("--stride", type=int, default=None,
+                        help="传给 habitat_splatam 的 --stride")
+    parser.add_argument("--python", type=str, default=None,
+                        help="子进程 python 路径（默认当前解释器）")
+    args = parser.parse_args()
+
+    script_dir = os.path.dirname(os.path.abspath(__file__))
+    base_dir = os.path.dirname(script_dir)
+    script_path = args.script or os.path.join(script_dir, "habitat_splatam.py")
+    config_path = args.config or os.path.join(base_dir, "configs", "habitat", "habitat_splatam.py")
+    py_exe = args.python or sys.executable
+
+    if not os.path.isfile(script_path):
+        print(f"Error: script not found: {script_path}", file=sys.stderr)
+        return 1
+    if not os.path.isfile(config_path):
+        print(f"Error: config not found: {config_path}", file=sys.stderr)
+        return 1
+
+    # 解析场景列表
+    scenes = []
+    if args.sequence:
+        scenes = [args.sequence.strip()]
+    elif args.scenes_file:
+        if not os.path.isfile(args.scenes_file):
+            print(f"Error: scenes_file not found: {args.scenes_file}", file=sys.stderr)
+            return 1
+        with open(args.scenes_file, "r", encoding="utf-8") as f:
+            scenes = [line.strip() for line in f if line.strip()]
+    else:
+        data_dir = args.data_dir
+        if not data_dir:
+            print("Error: 需提供 --data_dir（当未指定 --sequence/--scenes_file 时）", file=sys.stderr)
+            return 1
+        if not os.path.isdir(data_dir):
+            print(f"Error: data_dir not found: {data_dir}", file=sys.stderr)
+            return 1
+        scenes = _discover_scenes(data_dir)
+
+    if not scenes:
+        print("No scenes to build.")
+        return 0
+
+    build_basedir = os.path.abspath(args.basedir or args.data_dir or "")
+    if not build_basedir:
+        print("Error: 无法确定 basedir，请显式指定 --basedir", file=sys.stderr)
+        return 1
+
+    workdir = os.path.join(base_dir, "experiments", args.group_name)
+    os.makedirs(workdir, exist_ok=True)
+
+    to_run = []
+    for scene in scenes:
+        run_name = f"{scene}_seed4_clip"
+        params_npz = os.path.join(workdir, run_name, "params.npz")
+        if args.skip_existing and os.path.isfile(params_npz):
+            print(f"[skip] {scene} (exists: {params_npz})")
+            continue
+        to_run.append(scene)
+
+    print(f"Scenes to build: {len(to_run)} / {len(scenes)}")
+    print(f"Using Python: {py_exe}")
+
+    for scene in to_run:
+        cmd = [
+            py_exe,
+            script_path,
+            os.path.abspath(config_path),
+            "--sequence", scene,
+            "--group_name", args.group_name,
+            "--basedir", build_basedir,
+        ]
+        if args.max_frames is not None:
+            cmd += ["--num_frames", str(args.max_frames)]
+        if args.stride is not None:
+            cmd += ["--stride", str(args.stride)]
+
+        print("Run:", " ".join(cmd))
+        if args.dry_run:
+            continue
+        ret = subprocess.run(cmd, cwd=base_dir)
+        if ret.returncode != 0:
+            print(f"Failed: {scene} (exit {ret.returncode})", file=sys.stderr)
+            return ret.returncode
+
+    print("Done.")
+    return 0
+
+
+if __name__ == "__main__":
+    raise SystemExit(main())

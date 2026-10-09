@@ -1,0 +1,13 @@
+# 单场景 CrMo8WxCyVb 测试集 — 非GT 模式，六个创新点全开
+# 前置：将 data/habitat/CrMo8WxCyVb.zip 解压到 configs/data/habitat_val/CrMo8WxCyVb/，并完成 seg → transform → build_clip → 建图（params.npz 在 experiments/habitat_val_final/）
+# 用法: CUDA_VISIBLE_DEVICES=0 python run.py --config configs/instance_imagenav_test_crmo8wxcyvb_nogt_full.yaml
+defaults:
+  - instance_imagenav_val_nogt
+  - _self_
+
+habitat:
+  dataset:
+    content_scenes: ["CrMo8WxCyVb"]  # content/ 下文件名为 CrMo8WxCyVb.json.gz（若为 00810-CrMo8WxCyVb.json.gz 则改为该名）
+
+end2end_imagenav:
+  max_episodes: 1000
