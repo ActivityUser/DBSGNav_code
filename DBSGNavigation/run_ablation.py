@@ -69,18 +69,6 @@ def main():
     )
     args = parser.parse_args()
 
-    if args.preset:
-        cfg_path = os.path.join(_NAV_ROOT, CONFIG_MAP[args.preset])
-        print(f"[消融] preset={args.preset} ({PRESETS[args.preset]})")
-        print(f"[消融] config={cfg_path}")
-    else:
-        cfg_path = args.config
-        if not os.path.isabs(cfg_path):
-            cfg_path = os.path.join(_NAV_ROOT, cfg_path)
-        if not os.path.isfile(cfg_path):
-            parser.error(f"配置文件不存在: {cfg_path}")
-        print(f"[消融] config={cfg_path}")
-
     from runners.instance_imagenav_runner import Runner
 
     runner = Runner(cfg_pth=cfg_path)
