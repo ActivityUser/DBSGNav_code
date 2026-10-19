@@ -1468,17 +1468,14 @@ class NiceEnv(base_env):
                 self._override_metrics_for_forced_failure()
                 self._force_fail_episode = False
             return rgb.transpose(2, 0, 1), rew, done, self.info
-
-
-        # here, we directly get the goal position from environment
-        # we will update the code to get the goal position from Semantic Gaussian
+            
         use_stop = False
         if self.auto_stop_when_within_success_dist:
             try:
                 gd = self._current_geodesic_to_goal_viewpoints()
                 thr = self._auto_stop_geodesic_threshold()
                 if np.isfinite(gd) and gd < thr:
-                    use_stop = False
+                    use_stop = True
             except Exception:
                 use_stop = False
         if use_stop:
