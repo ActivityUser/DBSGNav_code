@@ -1478,7 +1478,7 @@ class NiceEnv(base_env):
                 gd = self._current_geodesic_to_goal_viewpoints()
                 thr = self._auto_stop_geodesic_threshold()
                 if np.isfinite(gd) and gd < thr:
-                    use_stop = True
+                    use_stop = False
             except Exception:
                 use_stop = False
         if use_stop:
