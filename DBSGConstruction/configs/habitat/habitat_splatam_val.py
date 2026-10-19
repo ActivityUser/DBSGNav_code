@@ -127,18 +127,7 @@ config = dict(
             reset_opacities=False,
             reset_opacities_every=500, # Doesn't consider iter 0
         ),
-        use_gaussian_splatting_densification=False, # Use Gaussian Splatting-based Densification during Mapping
-        densify_dict=dict( # Needs to be updated based on the number of mapping iterations
-            start_after=500,
-            remove_big_after=3000,
-            stop_after=5000,
-            densify_every=100,
-            grad_thresh=0.0002,
-            num_to_split_into=2,
-            removal_opacity_threshold=0.005,
-            final_removal_opacity_threshold=0.005,
-            reset_opacities_every=3000, # Doesn't consider iter 0
-        ),
+        
     ),
     viz=dict(
         render_mode='color', # ['color', 'depth' or 'centers']
