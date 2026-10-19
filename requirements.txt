@@ -2,6 +2,3 @@ scikit-fmm
 scikit-learn
 scikit-image
 numpy
-ifcfg
-open3d
-DBSGConstruction/diff-gaussian-rasterization-w-depth
