@@ -122,31 +122,3 @@ end2end_imagenav:
 
   # 创新点 5: 开放词汇评估基准（零样本测试集：COCO 类别外物体）
   use_open_vocab_benchmark: False  # True 时仅评估 object_category 不在标准 IIN 6 类中的 episode
-  # open_vocab_data_path: ""  # 可选：预生成的零样本数据集 .json.gz（可用 python -m datasets.open_vocab_iin build 生成）
-
-
-  mapper:
-    frame_height: 320
-    frame_width: 240
-    map_resolution: 5
-    map_size_cm: 3600
-    global_downscaling: 3
-    # 创新点 6: 动态语义更新（增量式 CLIP 语义图）
-    enable_dynamic_semantic_update: False  # True 时每步用当前帧 CLIP 更新 mapper 内语义图
-    dynamic_semantic_blend_alpha: 0.3     # 新观测权重 (1-alpha)*旧 + alpha*新（基准值）
-    # 动态 alpha：false | "count"(按更新次数) | "consistency"(按当前观测与地图一致性，更直观)
-    dynamic_semantic_adaptive_alpha: "consistency"
-    dynamic_semantic_alpha_min: 0.05      # 动态 alpha 下限
-    dynamic_semantic_alpha_decay: 0.5     # 仅 count 时用：alpha = base/(1 + k*count)
-    # 写入语义图前将每格 CLIP 向量 L2 单位化（默认 false；full 消融 yaml 可开）
-    dynamic_semantic_renormalize_cells: False
-    # 创新点 6 接入规划：用在线语义图与目标图的相似度，在锚点邻域内扩展 FMM 目标格（需 enable_dynamic_semantic_update=True）
-    dynamic_semantic_planner: True
-    dynamic_semantic_planner_thr: 0.18
-    dynamic_semantic_planner_radius: 22
-    dynamic_semantic_planner_min_timestep: 8
-    # 仅在阈值区内取若干相关峰值并入目标（减轻大片假阳性）；false=保留原有整块并入
-    dynamic_semantic_planner_peaks_only: false
-    dynamic_semantic_planner_max_peaks: 12
-    dynamic_semantic_planner_peak_min_sep: 3   # 峰值间曼哈顿间隔下限（>=1）
-
