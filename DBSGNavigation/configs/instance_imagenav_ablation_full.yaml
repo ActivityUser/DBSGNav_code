@@ -6,13 +6,3 @@ defaults:
   - instance_imagenav
   - _self_
 
-# 覆盖：六个创新点全部开启
-end2end_imagenav:
-  use_semantic_gaussian_goal: True   # 创新点2
-  use_open_vocab_retrieval: True    # 创新点3
-  open_vocab_semantic_weight: 0.7   # 创新点4
-  fusion_geometric_weight: 0.3
-  fusion_normalize_geometric: "minmax"
-  use_open_vocab_benchmark: False   # 创新点5：标准 IIN 时 False；零样本基准时改 True
-  mapper:
-    enable_dynamic_semantic_update: True  # 创新点6
