@@ -41,6 +41,14 @@ if str(_ROOT) not in sys.path:
     sys.path.insert(0, str(_ROOT))
 
 
+def _parse_max_episodes(argv):
+    if "--max_episodes" in argv:
+        idx = argv.index("--max_episodes")
+        if idx + 1 < len(argv):
+            return int(argv[idx + 1])
+    return None
+
+
 def _strip_log_file(argv):
     """解析并移除 --log_file <path>，避免传入未识别的参数。"""
     out = list(argv)

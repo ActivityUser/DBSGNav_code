@@ -43,6 +43,20 @@ def main():
     sys.argv = argv
 
     cfg = _DEFAULT_CFG
+    if "--config" in sys.argv:
+        idx = sys.argv.index("--config")
+        if idx + 1 < len(sys.argv):
+            cfg = sys.argv[idx + 1]
+    max_ep = _parse_max_episodes(sys.argv)
+
+    def _train(*, episode_goal_summary_append_path=None):
+        runner = Runner(
+            cfg_pth=cfg,
+            max_episodes=max_ep,
+            episode_goal_summary_append_path=episode_goal_summary_append_path,
+        )
+        runner.train()
+
     if log_file:
         from utils.tee_log import tee_session_log
 

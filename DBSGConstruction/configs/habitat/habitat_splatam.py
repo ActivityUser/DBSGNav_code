@@ -82,6 +82,15 @@ config = dict(
             im=0.5,
             depth=1.0,
         ),
+        lrs=dict(
+            means3D=0.0,
+            rgb_colors=0.0,
+            unnorm_rotations=0.0,
+            logit_opacities=0.0,
+            log_scales=0.0,
+            cam_unnorm_rots=0.002,
+            cam_trans=0.002,
+        ),
     ),
     mapping=dict(
         num_iters=mapping_iters,
